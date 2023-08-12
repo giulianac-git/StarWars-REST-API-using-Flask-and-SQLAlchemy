@@ -114,29 +114,6 @@ class User(db.Model):
             "is_active": self.is_active
         }
 
-# class Favorite(db.Model):
-#     __tablename__ = 'favorite'
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
-#     user = db.relationship(User)
-#     character_id = db.Column(db.Integer, db.ForeignKey('character.id'), nullable=True)
-#     character = db.relationship(Character)
-#     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'), nullable=True)
-#     planet = db.relationship(Planet)
-#     vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=True)
-#     vehicle = db.relationship(Vehicle)
-    
-#     def __repr__(self):
-#         return f"The user with id {self.user_id} has favorited: {self.character_id}, {self.planet_id}, {self.vehicle_id} "
-
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "character_id": self.character_id,
-#             "planet_id": self.planet_id,
-#             "vehicle_id": self.vehicle_id,
-#         }
-
 class Favorite(db.Model):
     __tablename__ = 'favorite'
     id = db.Column(db.Integer, primary_key=True)
