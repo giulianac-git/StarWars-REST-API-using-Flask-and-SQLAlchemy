@@ -121,7 +121,7 @@ def get_single_vehicle(vehicle_id):
 #Checks current user's favorites
 @app.route('/users/favorites/<int:user_id>', methods=['GET'])
 def get_user_favorites(user_id):
-    user_favorites = Favorite.query.filter_by(user_id=user_id)
+    user_favorites = Favorite.query.filter_by(user_id=user_id).all()
     if not user_favorites:
         raise APIException(f"User with id {user_id} has no favorites", status_code=400)
     favorites_serialized = list(map(lambda x: x.serialize(), user_favorites))
@@ -129,7 +129,7 @@ def get_user_favorites(user_id):
     return jsonify(response_body), 200
 
 # Adds to the favorite planet's list
-@app.route('/favorite/planets/<int:planet_id>', methods=['POST'])
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
 def add_favorite_planet(planet_id):
     body = request.get_json(silent=True)
     if body is None:
@@ -137,15 +137,20 @@ def add_favorite_planet(planet_id):
     if 'user_id' not in body:
         raise APIException('You must send the user id', status_code=400)
     user_id = body['user_id']
+    # Checks if it was already favorited by the user
+    existing_favorite = Favorite.query.filter_by(user_id=user_id, favorite_type='planet', favorite_id=planet_id).first()
+    if existing_favorite:
+        return jsonify({'message': 'Planet is already a favorite for this user'}), 409
+    #Adds favorite to the list
     favorite = Favorite(user_id=user_id, favorite_type='planet', favorite_id=planet_id)
     db.session.add(favorite)
     db.session.commit()
     return jsonify({'message': 'Favorite planet added successfully'}), 201
 
 # Removes a planet from the favorite planets' list
-@app.route('/favorite/planets/<int:planet_id>', methods=['DELETE'])
+@app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
 def delete_favorite_planet(planet_id):
-    favorite_planet = Favorite.query.filter_by(favorite_type='planet', favorite_id=planet_id)
+    favorite_planet = Favorite.query.filter_by(favorite_type='planet', favorite_id=planet_id).first()
     if favorite_planet is None:
         raise APIException("The planet doesn't exist", status_code=400)
     db.session.delete(favorite_planet)
@@ -153,7 +158,7 @@ def delete_favorite_planet(planet_id):
     return jsonify({'msg': 'Favorite planet deleted successfully'}), 200
 
 # Adds a character to the favorite characters' list
-@app.route('/favorite/characters/<int:character_id>', methods=['POST'])
+@app.route('/favorite/character/<int:character_id>', methods=['POST'])
 def add_favorite_character(character_id):
     body = request.get_json(silent=True)
     if body is None:
@@ -161,15 +166,20 @@ def add_favorite_character(character_id):
     if 'user_id' not in body:
         raise APIException('You must send the user id', status_code=400)
     user_id = body['user_id']
+    # Checks if it was already favorited by the user
+    existing_favorite = Favorite.query.filter_by(user_id=user_id, favorite_type='character', favorite_id=character_id).first()
+    if existing_favorite:
+        return jsonify({'message': 'Character is already a favorite for this user'}), 409
+    # Adds favorite to the list
     favorite = Favorite(user_id=user_id, favorite_type='character', favorite_id=character_id)
     db.session.add(favorite)
     db.session.commit()
     return jsonify({'message': 'Favorite character added successfully'}), 201
 
 # Removes a character from the favorite characters' list
-@app.route('/favorite/characters/<int:character_id>', methods=['DELETE'])
+@app.route('/favorite/character/<int:character_id>', methods=['DELETE'])
 def delete_favorite_character(character_id):
-    favorite_character = Favorite.query.filter_by(favorite_type='character', favorite_id=character_id)
+    favorite_character = Favorite.query.filter_by(favorite_type='character', favorite_id=character_id).first()
     if favorite_character is None:
         raise APIException("The character doesn't exist", status_code=400)
     db.session.delete(favorite_character)
@@ -177,7 +187,7 @@ def delete_favorite_character(character_id):
     return jsonify({'msg': 'Favorite character deleted successfully'}), 200
 
 # Adds a vehicle to the favorite vehicles' list
-@app.route('/favorite/vehicles/<int:vehicle_id>', methods=['POST'])
+@app.route('/favorite/vehicle/<int:vehicle_id>', methods=['POST'])
 def add_favorite_vehicle(vehicle_id):
     body = request.get_json(silent=True)
     if body is None:
@@ -185,15 +195,20 @@ def add_favorite_vehicle(vehicle_id):
     if 'user_id' not in body:
         raise APIException('You must send the user id', status_code=400)
     user_id = body['user_id']
+    # Checks if it was already favorited by the user
+    existing_favorite = Favorite.query.filter_by(user_id=user_id, favorite_type='vehicle', favorite_id=vehicle_id).first()
+    if existing_favorite:
+        return jsonify({'message': 'Vehicle is already a favorite for this user'}), 409
+    # Adds favorite to the list
     favorite = Favorite(user_id=user_id, favorite_type='vehicle', favorite_id=vehicle_id)
     db.session.add(favorite)
     db.session.commit()
     return jsonify({'message': 'Favorite vehicle added successfully'}), 201
 
 # Removes a vehicle from the favorite vehicles' list
-@app.route('/favorite/vehicles/<int:vehicle_id>', methods=['DELETE'])
+@app.route('/favorite/vehicle/<int:vehicle_id>', methods=['DELETE'])
 def delete_favorite_vehicle(vehicle_id):
-    favorite_vehicle = Favorite.query.filter_by(favorite_type='vehicle', favorite_id=vehicle_id)
+    favorite_vehicle = Favorite.query.filter_by(favorite_type='vehicle', favorite_id=vehicle_id).first()
     if favorite_vehicle is None:
         raise APIException("The vehicle doesn't exist", status_code=400)
     db.session.delete(favorite_vehicle)
